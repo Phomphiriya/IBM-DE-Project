@@ -1,0 +1,65 @@
+# !pip install pandas
+# !pip install bs4
+# !pip install requests
+
+from bs4 import BeautifulSoup
+import requests
+import pandas as pd
+
+# The wikipedia webpage https://en.wikipedia.org/wiki/List_of_largest_banks
+# provides information about largest banks in the world by various parameters.
+# Scrape the data from the table 'By market capitalization' and store it in a JSON file.
+
+import urllib.request
+import urllib.parse
+import urllib.error
+from bs4 import BeautifulSoup
+import ssl
+
+url = 'https://en.wikipedia.org/wiki/List_of_largest_banks'
+
+html_data = requests.get(url).text
+html1 = urllib.request.urlopen(url, context=None).read()
+print(html_data[101:123])
+
+# Question 2 Using the contents and beautiful soup load the
+# data from the By market capitalization table into a pandas
+# dataframe. The dataframe should have the country Name and
+# Market Cap (US$ Billion) as column names. Display the first
+# five rows using head.
+
+# Replace the dots below
+soup = BeautifulSoup(html_data,"html.parser")
+# soup = BeautifulSoup(page.text, 'lxml')
+# soup = BeautifulSoup(html_data, 'lxml')
+# print(soup)
+
+
+# Load the data from the By market capitalization
+# table into a pandas dataframe. The dataframe should
+# have the country Name and Market Cap (US$ Billion)
+# as column names. Using the empty dataframe data and
+# the given loop extract the necessary data from each
+# row and append it to the empty dataframe.
+
+data = pd.DataFrame(columns=["Name", "Market Cap (US$ Billion)"])
+banks = []
+cap = []
+for row in soup.find_all('tbody')[2].find_all('tr'):
+    cols = row.find_all('td')
+    if len(cols[:]) > 0:
+        for i in cols[1:2]:
+            banks.append(i.getText()[1:].strip())
+        for i in cols[2:]:
+            cap.append(i.getText()[2:].strip())
+    if len(cols) == 0:
+        continue
+    else:
+        data = data.append({ 'Rank': cols[0].text.strip(),'Name': cols[1].text.strip(),'Market Cap (US$ Billion)': cols[2].text.strip()}, ignore_index=True)
+
+# print(data)
+# data['Name'] = banks
+# print(data['Name'])
+# data['Market Cap (US$ Billion)'] = cap
+# print(data['Market Cap (US$ Billion)'])
+print(data)
