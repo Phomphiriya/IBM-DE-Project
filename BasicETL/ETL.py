@@ -11,7 +11,6 @@ list_json = glob.glob('*.json')
 def extract_from_csv(file_to_process):
     dataframe = pd.read_csv(file_to_process)
     return dataframe
-# df = extract_from_csv('source1.csv')
 
 def extract_from_json(file_to_process):
     dataframe = pd.read_json(file_to_process,lines=True)
@@ -34,10 +33,10 @@ def extract():
 
     #process all csv files
     for csvfile in glob.glob('*.csv'):
-        # print(csvfile)
+        print(csvfile)
         extracted_data = extracted_data.append(extract_from_csv(csvfile),ignore_index=True)
     
-        #process all json files
+    #process all json files
     for jsonfile in glob.glob('*.json'):
         extracted_data = extracted_data.append(extract_from_json(jsonfile),ignore_index=True)
     
@@ -50,16 +49,16 @@ df = extract()
 print(df)
 
 
-def transform(data):
-    data['height'] = round(data.height * 0.0254,2)
-    data['weight'] = round(data.weight * 0.4535,2)
-    return data
-print(transform(df))
+# def transform(data):
+#     data['height'] = round(data.height * 0.0254,2)
+#     data['weight'] = round(data.weight * 0.4535,2)
+#     return data
+# print(transform(df))
 
 
-def load(targetfile,data_to_load):
-    data_to_load.to_csv(targetfile)
-    # targetfile = 'transformed_data.csv'
-    # load(targetfile.transformed_data)
+# def load(targetfile,data_to_load):
+#     data_to_load.to_csv(targetfile)
+#     # targetfile = 'transformed_data.csv'
+#     # load(targetfile.transformed_data)
 
-load("transform_data.csv",df)
+# load("transform_data.csv",df)
