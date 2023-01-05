@@ -1,43 +1,51 @@
 import glob
+from tabulate import tabulate
 import pandas as pd
 from datetime import datetime
 
-columns = ['Country','Rates']
-exchange_file = 'exchange_rates.csv'
+columns = ['Name','Market Cap (US$ Billion)']
+exchange_rate_file = 'exchange_rates.csv'
+marketcap_file = 'bank_market_cap_1.json'
 
 def extract_from_csv(file_to_process):
     dataframe = pd.read_csv(file_to_process)
     return dataframe
 
+def extract_from_json(file_to_process):
+    dataframe = pd.read_json(file_to_process)
+    return dataframe
+
 def extract(slected_file):
-    extracted_data = extract_from_csv(slected_file)
+    # extracted_data = extract_from_csv(slected_file)
+    extracted_data = extract_from_json(slected_file)
     df = pd.DataFrame(extracted_data, columns=columns)
     return df
 
-df = extract(exchange_file)
-print(df)
+df = extract(marketcap_file)
+print(tabulate(df, headers = 'keys', tablefmt = 'psql'))
 
 # find GBP rates
-rates = pd.read_csv(exchange_file, index_col=0)
-GBP_rate = rates.at['GBP', 'Rates']
-print(GBP_rate)
+rates = pd.read_csv(exchange_rate_file, index_col=0)
+exchange_rate = rates.at['GBP', 'Market Cap (US$ Billion)']
+print(exchange_rate)
 
 
 # show 5 rows
-first5_country = extract(exchange_file)
+first5_country = extract(marketcap_file)
 print("head extract")
-print(first5_country.head())
+print(tabulate(first5_country.head(), headers = 'keys', tablefmt= 'pspl'))
 
 # transform
 def transform(data,exchange_rate):
-    data = data.rename(columns={'Rates': 'Rates_to_Dollar'})
-    data['Rates_to_Dollar'] = round(data.Rates_to_Dollar * exchange_rate, 3)
+    transformed_df = data.rename(columns={'Market Cap (US$ Billion)': 'Dollar'})
+    transformed_df['Dollar'] = round(transformed_df.Dollar * exchange_rate, 3)
+    transformed_df = transformed_df.rename(columns={'Dollar': 'Market Cap (GBP$ Billion)'})
     # print(data)
-    return data
+    return transformed_df
 
-transformed_data = transform(df,0.7323984208000001)
+transformed_data = transform(df,exchange_rate)
 print("head transformed")
-print(transformed_data.head())
+print(tabulate(transformed_data.head(),headers = 'keys', tablefmt='pspl'))
 
 # load
 def load(targetfile,data_to_load):
